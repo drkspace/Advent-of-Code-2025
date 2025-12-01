@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakePythonSetting">
+    <option name="pythonIntegrationState" value="YES" />
+  </component>
+  <component name="CMakeWorkspace" PROJECT_DIR="$PROJECT_DIR$" />
+  <component name="GithubDefaultAccount">
+    <option name="defaultAccountId" value="76451601-0ea0-4c4c-b82e-12e1ccf1efa1" />
+  </component>
+</project>
