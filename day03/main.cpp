@@ -1,6 +1,7 @@
 
 #include <print>
 #include "../utils/utils.h"
+#include "../utils/easyTimer.hpp"
 #include <cstdio>
 #include <cmath>
 
@@ -26,6 +27,30 @@ auto getInput(const std::string& fp)
     return out;
 }
 
+[[nodiscard]] constexpr auto find_max(const auto& bank, const size_t battery_size)
+{
+    const auto len = bank.size();
+    dt building = 0;
+
+    // This will wrap to the max size_t value, but I will add 1 to it,
+    // Which will overflow it back to 0
+    size_t max_idx = -1;
+    for (size_t i = 1; i<=battery_size; i++)
+    {
+        dt max = 0;
+        for (size_t j = max_idx+1; j < len-battery_size+i; j++)
+        {
+            if (bank.at(j) > max)
+            {
+                max = bank[j];
+                max_idx = j;
+            }
+        }
+        building = building*10 + max;
+    }
+    return building;
+}
+
 int main(const int argc, char* argv[])
 {
     if (!(argc == 2 || argc == 3))
@@ -36,58 +61,21 @@ int main(const int argc, char* argv[])
     const auto inp = getInput(argv[1]);
 
     {
+        easyTimer<std::chrono::milliseconds> _;
         dt sum = 0;
         for (const auto& bank: inp)
         {
-            dt max = 0;
-            dt max1 = 0;
-            for (size_t i = 0; i< bank.size(); i++)
-            {
-                const auto tmp = bank[i]*10;
-                if (tmp < max1)
-                {
-                    continue;
-                }
-                for (size_t j = i+1; j<bank.size(); j++)
-                {
-                    if (const auto tmp2 = tmp+bank[j]; tmp2 > max)
-                    {
-                        max = tmp2;
-                        max1 = tmp;
-                    }
-                }
-            }
-
-            sum += max;
+            sum += find_max(bank, 2);
         }
         std::println("Part 1: {}", sum);
     }
 
     {
-
+        easyTimer<std::chrono::milliseconds> _;
         dt sum = 0;
         for (const auto& bank: inp)
         {
-            const auto len = bank.size();
-            dt building = 0;
-
-            // This will wrap to the max size_t value, but I will add 1 to it,
-            // Which will overflow it back to 0
-            size_t max_idx = -1;
-            for (size_t i = 1; i<=12; i++)
-            {
-                dt max = 0;
-                for (size_t j = max_idx+1; j < len-12+i; j++)
-                {
-                    if (bank.at(j) > max)
-                    {
-                        max = bank[j];
-                        max_idx = j;
-                    }
-                }
-                building = building*10 + max;
-            }
-            sum += building;
+            sum += find_max(bank, 12);
         }
 
         std::println("Part 2: {}", sum);
