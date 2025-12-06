@@ -4,6 +4,7 @@
 #include "../utils/easyTimer.hpp"
 #include <cstdio>
 #include <cmath>
+#include <numeric>
 
 auto getInput(const std::string& fp)
 {
@@ -93,22 +94,11 @@ auto getInput2(const std::string& fp)
     {
         if (op == '+')
         {
-
-            u64 tmp = 0;
-            for (const auto ele: num)
-            {
-                tmp += ele;
-            }
-            sum += tmp;
+            sum += std::accumulate(num.begin(), num.end(), static_cast<u64>(0));
         }
-        if (op == '*')
+        else if (op == '*')
         {
-            u64 tmp = 1;
-            for (const auto ele: num)
-            {
-                tmp *= ele;
-            }
-            sum += tmp;
+            sum += std::accumulate(num.begin(), num.end(), static_cast<u64>(1), std::multiplies<u64>());
         }
     }
     return sum;
