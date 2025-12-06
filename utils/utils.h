@@ -15,6 +15,7 @@
 #include <fstream>
 #include <sstream>
 #include <set>
+#include <generator>
 
 inline const auto& enumerate = std::ranges::views::enumerate;
 
@@ -115,8 +116,16 @@ inline void ltrim(std::string &s) {
     }));
 }
 
-template<typename R>
-void print_arr(R&& arr, const std::string sep = ",")
+template <typename R>
+concept OneDRange = std::ranges::input_range<R>;
+
+template <typename R>
+concept TwoDRange =
+    std::ranges::input_range<R> &&
+    std::ranges::input_range<std::ranges::range_value_t<R>>;
+
+template<OneDRange R>
+void print_arr(const R& arr, const std::string sep = ",")
 {
     for (const auto& ele: arr)
     {
@@ -125,15 +134,15 @@ void print_arr(R&& arr, const std::string sep = ",")
     std::println("");
 }
 
-// template <typename T, size_t N>
-// void print_arr(std::span<T, N> arr, const std::string sep = ",")
-// {
-//     for (const auto& ele: arr)
-//     {
-//         std::print("{}{}", ele, sep);
-//     }
-//     std::println("");
-// }
+template<TwoDRange R>
+void print_arr(const R& arr, const std::string sep = ",")
+{
+    for (const auto& row: arr)
+    {
+       print_arr(row, sep);
+    }
+    std::println("");
+}
 
 template <typename T>
 [[nodiscard]] inline T pmod(const T& a, const T& b)
@@ -151,6 +160,34 @@ template <typename T>
 [[nodiscard]] constexpr T sign(const T& v)
 {
     return (T(0) < v) - (v < T(0));
+}
+
+
+template <TwoDRange R>
+[[nodiscard]] constexpr std::generator<const std::ranges::range_value_t<std::ranges::range_value_t<R>>&> around(const R& arr, const size_t i, const size_t j)
+{
+    const bool at_top = i==0;
+    const bool at_bottom = i==arr.size()-1;
+    const bool at_left = j==0;
+    const bool at_right = j==arr[0].size()-1;
+    if (!at_top)
+    {
+        co_yield arr[i-1][j];
+
+        if (!at_left) co_yield arr[i-1][j-1];
+        if (!at_right) co_yield arr[i-1][j+1];
+    }
+
+    if (!at_left) co_yield arr[i][j-1];
+    if (!at_right) co_yield arr[i][j+1];
+
+    if (!at_bottom)
+    {
+        co_yield arr[i+1][j];
+
+        if (!at_left) co_yield arr[i+1][j-1];
+        if (!at_right) co_yield arr[i+1][j+1];
+    }
 }
 
 #endif //UTILS_H

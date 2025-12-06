@@ -4,6 +4,7 @@ project(avoc2025)
 set(CMAKE_CXX_COMPILER g++-14)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_BUILD_PARALLEL_LEVEL 8)
 add_compile_options(-Wall -Wextra -Werror)
 
 add_executable(day01 day01/main.cpp utils/)

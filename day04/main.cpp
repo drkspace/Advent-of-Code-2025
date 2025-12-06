@@ -31,38 +31,9 @@ int main(const int argc, char* argv[])
                     continue;
                 }
                 int c = 0;
-                if (i>0)
+                for (const auto& ele: around(inp, i, j))
                 {
-                    if (j > 0)
-                    {
-                        c += inp[i-1][j-1] == '@';
-                    }
-                    if (j < inp.size()-1)
-                    {
-                        c += inp[i-1][j+1] == '@';
-                    }
-                    c += inp[i-1][j] == '@';
-                }
-
-                if (j > 0)
-                {
-                    c += inp[i][j-1] == '@';
-                }
-                if (j < inp.size()-1)
-                {
-                    c += inp[i][j+1] == '@';
-                }
-                if (i<inp.size()-1)
-                {
-                    if (j > 0)
-                    {
-                        c += inp[i+1][j-1] == '@';
-                    }
-                    if (j < inp.size()-1)
-                    {
-                        c += inp[i+1][j+1] == '@';
-                    }
-                    c += inp[i+1][j] == '@';
+                    c += ele=='@';
                 }
                 if (c<4)
                 {
@@ -91,38 +62,9 @@ int main(const int argc, char* argv[])
                         continue;
                     }
                     int c = 0;
-                    if (i>0)
+                    for (const auto& ele: around(inp, i, j))
                     {
-                        if (j > 0)
-                        {
-                            c += inp[i-1][j-1] == '@';
-                        }
-                        if (j < inp.size()-1)
-                        {
-                            c += inp[i-1][j+1] == '@';
-                        }
-                        c += inp[i-1][j] == '@';
-                    }
-
-                    if (j > 0)
-                    {
-                        c += inp[i][j-1] == '@';
-                    }
-                    if (j < inp.size()-1)
-                    {
-                        c += inp[i][j+1] == '@';
-                    }
-                    if (i<inp.size()-1)
-                    {
-                        if (j > 0)
-                        {
-                            c += inp[i+1][j-1] == '@';
-                        }
-                        if (j < inp.size()-1)
-                        {
-                            c += inp[i+1][j+1] == '@';
-                        }
-                        c += inp[i+1][j] == '@';
+                        c += ele=='@';
                     }
                     if (c<4)
                     {
@@ -146,6 +88,5 @@ int main(const int argc, char* argv[])
         }
         std::println("Part 2 {}", tot);
     }
-
     return 0;
 }
