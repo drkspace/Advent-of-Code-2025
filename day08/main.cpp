@@ -7,13 +7,13 @@
 #include <cmath>
 #include <numeric>
 #include <unordered_map>
-#include "../utils/point.h"
+#include <unordered_set>
 
-using i64 = std::int64_t;
+#include "../utils/point.h"
 
 auto getInput(const std::string& fp)
 {
-    auto lines =read_file(fp);
+    const auto lines =read_file(fp);
     std::vector<Point3d<i64>> points;
     for (const auto& line: lines)
     {
@@ -21,7 +21,6 @@ auto getInput(const std::string& fp)
         {
             break;
         }
-        // std::println("{}", line);
         auto parts = split(line, ',');
         points.emplace_back(std::stoll(parts.at(0)), std::stoll(parts.at(1)), std::stoll(parts.at(2)));
     }
@@ -39,37 +38,32 @@ int main(const int argc, char* argv[])
     }
     auto inp = getInput(argv[1]);
 
+    std::vector<std::tuple<i64, int, int>> distances;
+
+    for (const auto [i, p1]: enumerate(inp))
+    {
+        for (const auto [j, p2]: enumerate(inp))
+        {
+            if (j <= i)
+            {
+                continue;
+            }
+            distances.emplace_back((p1-p2).radicand(), i, j);
+        }
+    }
+    std::ranges::sort(distances);
+
     {
         std::unordered_map<int, int> idx_to_cn;
-        std::unordered_map<int, i64> cn_count;
+        std::unordered_map<int, int> cn_count;
         int cn = 0;
-        std::vector<std::tuple<i64, int, int>> distances;
-        // print_arr(inp);
-        for (const auto [i, p1]: enumerate(inp))
-        {
-            for (const auto [j, p2]: enumerate(inp))
-            {
-                if (j <= i)
-                {
-                    continue;
-                }
-                distances.emplace_back((p1-p2).radicand(), i, j);
-            }
-        }
-        std::ranges::sort(distances);
+
         int n_pairs = 0;
         // constexpr int max_pairs = 500-1;
-        for (const auto&[i, parts]: enumerate(distances))
+        for (const auto& parts: std::span{distances}.subspan(0,1000))
         {
-            if (i >= 1000)
-            {
-                break;
-            }
             const auto& [dist, i1, i2] = parts;
-            // if (n_pairs >= max_pairs)
-            // {
-            //     continue;
-            // }
+
             if (idx_to_cn.contains(i1) && idx_to_cn.contains(i2) && idx_to_cn[i1] == idx_to_cn[i2])
             {
                 continue;
@@ -117,13 +111,8 @@ int main(const int argc, char* argv[])
         const auto tmp = cn_count | std::views::values;
         std::vector<i64> vals{tmp.begin(), tmp.end()};
         std::ranges::sort(vals, std::greater<i64>{});
-        for (const auto [i, v] : enumerate(vals))
+        for (const auto v : std::span{vals}.subspan(0,3))
         {
-            if (i == 3)
-            {
-                break;
-            }
-            std::println("{}", v);
             prod *= v;
         }
         std::println("Part 1: {}", prod);
@@ -133,20 +122,7 @@ int main(const int argc, char* argv[])
         std::unordered_map<int, int> idx_to_cn;
         std::unordered_map<int, i64> cn_count;
         int cn = 0;
-        std::vector<std::tuple<i64, int, int>> distances;
 
-        for (const auto [i, p1]: enumerate(inp))
-        {
-            for (const auto [j, p2]: enumerate(inp))
-            {
-                if (j <= i)
-                {
-                    continue;
-                }
-                distances.emplace_back((p1-p2).radicand(), i, j);
-            }
-        }
-        std::ranges::sort(distances);
         int n_pairs = 0;
         for (const auto&[dist, i1, i2]: distances)
         {

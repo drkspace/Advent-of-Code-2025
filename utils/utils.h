@@ -20,6 +20,7 @@
 inline const auto& enumerate = std::ranges::views::enumerate;
 
 using u64 = std::uint64_t;
+using i64 = std::int64_t;
 
 inline auto split(const std::string& inp, const char delim, const bool remove_empty = false) {
     std::string tmp;
