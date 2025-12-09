@@ -71,6 +71,10 @@ struct Point2d
     {
         return std::atan2(y,x);
     }
+    [[nodiscard]] Point2d sign() const
+    {
+        return {x>0?1:-1, y>0?1:-1};
+    }
 };
 
 template<typename T>
