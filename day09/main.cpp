@@ -44,15 +44,17 @@ int main(const int argc, char* argv[])
             for (const auto& v2: std::span{inp}.subspan(i+1))
             {
                 const auto tmp = v-v2;
-                const auto a = std::abs((tmp.x+1)*(tmp.y+1));
+                const auto a = (std::abs(tmp.x)+1)*(std::abs(tmp.y)+1);
                 if (a > area)
                 {
                     area = a;
                 }
             }
         }
+
         std::println("Part 1: {}", area);
     }
+
     {
         i64 area = 0;
 
@@ -100,14 +102,6 @@ int main(const int argc, char* argv[])
         for (const auto& [i, z]: enumerate(std::ranges::views::zip(inp, dirs)))
         {
             const auto& [v, dir] = z;
-            std::println("{} {}", v, dir);
-        }
-        // return 0;
-        std::println("\n\n");
-
-        for (const auto& [i, z]: enumerate(std::ranges::views::zip(inp, dirs)))
-        {
-            const auto& [v, dir] = z;
 
 
             for (const auto& [_i, v2]: enumerate(std::span{inp}.subspan(i+1)))
@@ -119,15 +113,11 @@ int main(const int argc, char* argv[])
                 const auto tmp = v-v2;
 
                 const auto sign = tmp.sign();
-                // std::println("{} {} {} {}", v, v2, sign, sign*-1);
-                // std::println("{} {} {} {}", dir, dir2, dir2==sign, dir2==sign*-1);
                 if(!(dir == sign || dir2 == sign || dir == sign*-1 || dir2 == sign*-1)){
                     continue;
                 }
 
-                const auto a = std::abs((tmp.x+1)*(tmp.y+1));
-
-                // std::println("{} {}", v, v2);
+                const auto a = (std::abs(tmp.x)+1)*(std::abs(tmp.y)+1);
 
                 const auto min_x = std::min(v.x, v2.x);
                 const auto max_x = std::max(v.x, v2.x);
@@ -155,8 +145,6 @@ int main(const int argc, char* argv[])
                     if(v3 == v || v3 == v2){
                         continue;
                     }
-                    // if (((min_x < v3.x && v3.x < max_x) && (min_y <= v3.y && v3.y <= max_y)) ||
-                    //     ((min_x <= v3.x && v3.x <= max_x) && (min_y < v3.y && v3.y < max_y)))
                     if((min_x < v3.x && v3.x < max_x) && (min_y < v3.y && v3.y < max_y))
                     {
                         bad = true;
@@ -165,9 +153,9 @@ int main(const int argc, char* argv[])
 
                     if((min_x == v3.x || max_x == v3.x) && (max_y > v3.y && min_y < v3.y)){
                         // On a vertical edge of the rectangle
-
                         if(prev_corner.x == v3.x){
-                            if(v3.x == min_x && (next_corner.x > v3.x)){
+                            if(v3.x == min_x && (next_corner.x > v3.x))
+                            {
                                 bad = true;
                                 break;
                             }
@@ -177,7 +165,8 @@ int main(const int argc, char* argv[])
                             }
                         }
                         else if(next_corner.x == v3.x){
-                            if(v3.x == min_x && (prev_corner.x > v3.x)){
+                            if(v3.x == min_x && (prev_corner.x > v3.x))
+                            {
                                 bad = true;
                                 break;
                             }
@@ -187,8 +176,6 @@ int main(const int argc, char* argv[])
                             }
                         }
 
-                        bad = true;
-                        break;
                     }
                     if((min_y == v3.y || max_y == v3.y) && (max_x > v3.x && min_x < v3.x)){
                         // On a horizontal edge of the rectangle
@@ -216,6 +203,23 @@ int main(const int argc, char* argv[])
                     }
 
 
+                    if (v3.x > max_x)
+                    {
+                        if (prev_corner.x < min_x || next_corner.x < min_x)
+                        {
+                            bad=true;
+                            break;
+                        }
+                    }
+                    if (v3.y > max_y)
+                    {
+                        if (prev_corner.y < min_y || next_corner.y < min_y)
+                        {
+                            bad=true;
+                            break;
+                        }
+                    }
+
                 }
                 if (bad)
                 {
@@ -223,16 +227,11 @@ int main(const int argc, char* argv[])
                 }
                 if (a > area)
                 {
-                std::println("{} {} {}", v, v2, a);
+                    // std::println("{} {} {}", v, v2, a);
                     area = a;
                 }
             }
         }
-        // != 4633585821
-        // != 4518297360
-        // != 4509636086
-        // != 4508133502
-        
         std::println("Part 2: {}", area);
     }
     return 0;
