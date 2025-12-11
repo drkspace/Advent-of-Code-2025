@@ -61,33 +61,62 @@ auto getInput(const std::string& fp)
     return count;
 }
 
-[[nodiscard]] int helper2(const std::unordered_map<std::string, std::vector<std::string>>& paths, const std::string& cur, bool found_dac, bool found_fft)
-{
+struct RT{
+    int need_neither = 0;
+    int need_dac = 0;
+    int need_fft = 0;
+    int need_both = 0;
+};
 
+using CacheType = std::unordered_map<std::string, RT>;
+
+[[nodiscard]] RT helper2(const std::unordered_map<std::string, std::vector<std::string>>& paths, const std::string& cur, CacheType& cache, int level)
+{
+    if(const auto& itr = cache.find(cur); itr != cache.end())
+    {
+        return itr->second;
+    }
+    // Prevents loops
+    cache[cur] = {};
     if (cur == "out")
     {
-        return found_dac && found_fft;
+        return RT(0, 0, 0, 1);
     }
     if (!paths.contains(cur))
     {
-        return 0;
+        return {};
     }
 
-    if (!found_dac && cur == "dac")
-    {
-        found_dac = true;
-    }
-    if (!found_fft && cur == "fft")
-    {
-        found_fft = true;
-    }
+    const bool is_dac = cur == "dac";
+    const bool is_fft = cur == "fft";
 
-    int count = 0;
+    RT children(0,0,0,0);
     for (const auto& next: paths.at(cur))
     {
-        count += helper2(paths, next, found_dac, found_fft);
+        const auto& [c, nd, nf, nb] = helper2(paths, next, cache, level+1);
+
+        children.need_neither += c;
+        children.need_dac += nd;
+        children.need_fft += nf;
+        children.need_both += nb;
     }
-    return count;
+
+    if(is_dac){
+        children.need_neither += children.need_dac;
+        children.need_dac = 0;
+        children.need_fft += children.need_both;
+        children.need_both = 0;
+    }
+    if(is_fft){
+        children.need_neither += children.need_fft;
+        children.need_fft = 0;
+        children.need_dac += children.need_both;
+        children.need_both = 0;
+    }
+
+    cache[cur] = children;
+    // std::println("{}: {}", level, children.need_neither);
+    return children;
 }
 
 [[nodiscard]] int count_paths2(const std::unordered_map<std::string, std::vector<std::string>>& paths)
@@ -96,8 +125,9 @@ auto getInput(const std::string& fp)
     std::unordered_map<std::string, int> cache{};
     for (const auto& next: paths.at("svr"))
     {
-        count += helper2(paths, next, false, false);
-        std::println("{}", count);
+        CacheType cache{};
+        const auto& res = helper2(paths, next, cache, 1);
+        count += res.need_neither;
     }
     return count;
 }
