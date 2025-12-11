@@ -33,7 +33,7 @@ auto getInput(const std::string& fp)
     return paths;
 }
 
-[[nodiscard]] int helper(const std::unordered_map<std::string, std::vector<std::string>>& paths, const std::string& cur, int depth)
+[[nodiscard]] int helper(const std::unordered_map<std::string, std::vector<std::string>>& paths, const std::string& cur)
 {
     if (cur == "out")
     {
@@ -46,7 +46,7 @@ auto getInput(const std::string& fp)
     int count = 0;
     for (const auto& next: paths.at(cur))
     {
-        count += helper(paths, next, depth+1);
+        count += helper(paths, next);
     }
     return count;
 }
@@ -56,28 +56,27 @@ auto getInput(const std::string& fp)
     int count = 0;
     for (const auto& next: paths.at("you"))
     {
-        count += helper(paths, next, 1);
+        count += helper(paths, next);
     }
     return count;
 }
 
 struct RT{
-    int need_neither = 0;
-    int need_dac = 0;
-    int need_fft = 0;
-    int need_both = 0;
+    i64 need_neither = 0;
+    i64 need_dac = 0;
+    i64 need_fft = 0;
+    i64 need_both = 0;
 };
 
 using CacheType = std::unordered_map<std::string, RT>;
 
-[[nodiscard]] RT helper2(const std::unordered_map<std::string, std::vector<std::string>>& paths, const std::string& cur, CacheType& cache, int level)
+[[nodiscard]] RT helper2(const std::unordered_map<std::string, std::vector<std::string>>& paths, const std::string& cur, CacheType& cache)
 {
     if(const auto& itr = cache.find(cur); itr != cache.end())
     {
         return itr->second;
     }
-    // Prevents loops
-    cache[cur] = {};
+
     if (cur == "out")
     {
         return RT(0, 0, 0, 1);
@@ -93,12 +92,12 @@ using CacheType = std::unordered_map<std::string, RT>;
     RT children(0,0,0,0);
     for (const auto& next: paths.at(cur))
     {
-        const auto& [c, nd, nf, nb] = helper2(paths, next, cache, level+1);
+        const auto& child = helper2(paths, next, cache);
 
-        children.need_neither += c;
-        children.need_dac += nd;
-        children.need_fft += nf;
-        children.need_both += nb;
+        children.need_neither += child.need_neither;
+        children.need_dac += child.need_dac;
+        children.need_fft += child.need_fft;
+        children.need_both += child.need_both;
     }
 
     if(is_dac){
@@ -115,18 +114,16 @@ using CacheType = std::unordered_map<std::string, RT>;
     }
 
     cache[cur] = children;
-    // std::println("{}: {}", level, children.need_neither);
     return children;
 }
 
-[[nodiscard]] int count_paths2(const std::unordered_map<std::string, std::vector<std::string>>& paths)
+[[nodiscard]] i64 count_paths2(const std::unordered_map<std::string, std::vector<std::string>>& paths)
 {
-    int count = 0;
-    std::unordered_map<std::string, int> cache{};
+    i64 count = 0;
+    CacheType cache{};
     for (const auto& next: paths.at("svr"))
     {
-        CacheType cache{};
-        const auto& res = helper2(paths, next, cache, 1);
+        const auto& res = helper2(paths, next, cache);
         count += res.need_neither;
     }
     return count;
@@ -143,10 +140,10 @@ int main(const int argc, char* argv[])
     const auto inp = getInput(argv[1]);
 
 
-    // {
-    //     auto npaths = count_paths(inp);
-    //     std::println("Part 1: {}", npaths);
-    // }
+    {
+        auto npaths = count_paths(inp);
+        std::println("Part 1: {}", npaths);
+    }
 
     {
         auto npaths = count_paths2(inp);
