@@ -146,14 +146,14 @@ int main(const int argc, char* argv[])
     }
     const auto inp = getInput(argv[1]);
 
-    // {
-    //     int sum = 0;
-    //     for (const auto& [i,m]: enumerate(inp))
-    //     {
-    //         sum += run(m);
-    //     }
-    //     std::println("Part 1: {}", sum);
-    // }
+    {
+        int sum = 0;
+        for (const auto& [i,m]: enumerate(inp))
+        {
+            sum += run(m);
+        }
+        std::println("Part 1: {}", sum);
+    }
     {
         int sum = 0;
         for (const auto& [i,m]: enumerate(inp))
